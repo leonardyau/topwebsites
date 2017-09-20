@@ -25,7 +25,7 @@
             <div class="col-md-5 col-md-offset-1">
                <div class="row">
                   <div class="col-xs-8">
-                     <h4>Exlcusion Setting</h4>
+                     <h4>Exlcusion Service</h4>
                   </div>
                   <div class="col-xs-4 text-right">
                      <a href="/exclusion" class="btn btn-primary">
@@ -56,7 +56,7 @@
             <div class="col-md-5">
                <div class="row">
                   <div class="col-xs-8">
-                     <h4>Import Setting</h4>
+                     <h4>Import Service <span style="display:inline-block; margin-left: 20;"></span><span th:if="${importstatus==true}" class="label label-success">Running</span><span th:if="${importstatus==false}" class="label label-danger">Stopped</span></h4>
                   </div>
                   <div class="col-xs-4 text-right">
                      <a href="/history" class="btn btn-primary">

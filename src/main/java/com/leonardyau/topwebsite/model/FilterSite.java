@@ -10,21 +10,27 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Entity for storing the filter site information
+ * 
+ * @author Leonard
+ *
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class FilterSite implements Serializable, Cloneable{
+public class FilterSite implements Serializable, Cloneable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -4875549908039902202L;
-	
+
 	private String host;
-	
+
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date excludedSince;
-	
+
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date excludedTill;
 }

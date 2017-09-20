@@ -32,7 +32,7 @@
 							<th class="col-md-3">
 								Date			
 							</th>				
-							<th class="col-md-4">
+							<th class="col-md-3">
 								File
 							</th>
 							<th class="col-md-2">
@@ -41,15 +41,19 @@
 							<th class="col-md-2">
 								Imported records
 							</th>
+							<th class="col-md-1">
+								Duration (sec)
+							</th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr th:each = "h,iterStatus :${history}">
 								<td th:utext="${iterStatus.count}+${pageNumber}*${size}"></td>
-								<td th:utext="${#dates.format(h.date, 'yyyy-MM-dd hh:mm:ss')}"></td>
+								<td th:utext="${#dates.format(h.date, 'yyyy-MM-dd HH:mm:ss')}"></td>
 								<td th:utext="${h.filename}"></td>
 								<td th:utext="${h.total}"></td>
 								<td th:utext="${h.imported}"></td>
+								<td th:utext="${#numbers.formatDecimal(h.duration/1000.0, 0, 3)}"></td>
 							</tr>
 						</tbody>
 					</table>

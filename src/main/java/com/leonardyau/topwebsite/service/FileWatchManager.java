@@ -24,6 +24,13 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Service to watch a folder for the workfile This service makes use of Java
+ * WatchService to implement, avoiding periodical polling
+ * 
+ * @author Leonard
+ *
+ */
 @Service
 @Slf4j
 public class FileWatchManager {
@@ -31,11 +38,13 @@ public class FileWatchManager {
 	@Setter
 	@Getter
 	@Value("${filewatch.path}")
+	// Path to watch for
 	private volatile String watchPath;
 
 	@Setter
 	@Getter
 	@Value("${filewatch.extension}")
+	// File extension to watch for
 	private volatile String fileExtension;
 
 	@Autowired
@@ -43,6 +52,7 @@ public class FileWatchManager {
 
 	private ExecutorService executor;
 
+	// actual worker for the monitor job
 	private volatile FileWatchWorker worker = null;
 	private Future<?> status;
 
@@ -50,7 +60,10 @@ public class FileWatchManager {
 		executor = Executors.newSingleThreadScheduledExecutor();
 	}
 
-	
+	public boolean isRunning() {
+		return (worker != null);
+	}
+
 	public synchronized void start() {
 		if (worker != null) {
 			log.warn("File watcher service is already running on {}", watchPath.toString());
@@ -59,18 +72,20 @@ public class FileWatchManager {
 
 		try {
 			worker = new FileWatchWorker(Paths.get(watchPath), fileExtension);
+			status = executor.submit(worker);
 		} catch (IOException e) {
 			log.warn("Error in setting up watcher {}", e.getMessage());
 		}
-		status = executor.submit(worker);
 	}
 
 	public synchronized void stop() {
 		try {
 			log.info("Stopping file watcher service");
-			worker.stop();
-			status.get();
-			worker = null;
+			if (worker != null) {
+				worker.stop();
+				status.get();
+				worker = null;
+			}
 			log.info("Stopped file watcher service");
 		} catch (InterruptedException | ExecutionException e) {
 			log.warn("Error in stopping watcher service {}", e.getMessage());
@@ -95,8 +110,6 @@ public class FileWatchManager {
 
 		void checkFolder(Path path) throws IOException {
 			Files.walk(path, 1).filter(p -> matchFile(p)).forEach(p -> filehandler.process(p));
-			// Files.walk(path, 1).forEach(fileFunc);
-			// && p.getFileName().getClass().toString().toLowerCase().endsWith("csv")
 		}
 
 		void stop() {
@@ -112,18 +125,22 @@ public class FileWatchManager {
 			try {
 				log.info("File watcher service is starting for {}", watchPath.toString());
 				WatchKey k;
+				// Check any file needs to be processed before the watcher starts
 				checkFolder(path);
 				while (true) {
 					k = watchService.take();
-					List<WatchEvent<?>> events = (List<WatchEvent<?>>)k.pollEvents();
+					List<WatchEvent<?>> events = (List<WatchEvent<?>>) k.pollEvents();
 					log.info("File watcher events detected : {}", events.size());
 					for (WatchEvent<?> event : events) {
+						// for created files
 						if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
 							Path foundpath = Paths.get(path.toString(), ((Path) event.context()).toString());
 							log.info("Detected file: {}", foundpath);
 							if (matchFile(foundpath)) {
 								filehandler.process(foundpath);
 							}
+							// for handling too many events happening and potential missed files
+							// do a full folder check
 						} else if (event.kind() == StandardWatchEventKinds.OVERFLOW) {
 							checkFolder(path);
 						}
@@ -134,7 +151,7 @@ public class FileWatchManager {
 				log.warn("Error in file watcher {} {}", path, e.getMessage());
 				return;
 			} catch (ClosedWatchServiceException l) {
-				
+
 			}
 		}
 	}

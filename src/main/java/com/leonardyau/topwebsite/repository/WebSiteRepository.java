@@ -9,6 +9,11 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.leonardyau.topwebsite.model.WebSiteAccess;
 
+/**
+ * Repository for storing the websites access count and date
+ * @author Leonard
+ *
+ */
 public interface WebSiteRepository extends MongoRepository<WebSiteAccess, String>, WebSiteRepositoryCustom {
 	Page<WebSiteAccess> findAll(Pageable pageable);
 

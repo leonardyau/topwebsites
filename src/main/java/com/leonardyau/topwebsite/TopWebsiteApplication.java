@@ -13,6 +13,10 @@ import org.springframework.web.client.RestTemplate;
 import com.leonardyau.topwebsite.service.FileWatchManager;
 
 
+/**
+ * @author Leonard
+ *
+ */
 @SpringBootApplication
 @EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
 public class TopWebsiteApplication {
@@ -30,6 +34,9 @@ public class TopWebsiteApplication {
 		SpringApplication.run(TopWebsiteApplication.class, args);
 	}
 
+	/**
+	 * Start the file watcher
+	 */
 	@PostConstruct
 	public void startWatcher() {
 		fm.start();
