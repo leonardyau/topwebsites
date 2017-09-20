@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.1.3/css/bootstrap-datetimepicker.min.css" />
+		<link rel="sytlesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" />
+		<!-- Latest compiled and minified JavaScript -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.1.3/js/bootstrap-datetimepicker.min.js"></script>
+	</head>
+	<body>
+		<div class="container-fluid page-header">
+			<div class="col-sm-1 col-sm-offset-1">
+				<a href="/"><img th:src="@{images/logo.png}" src="../static/images/logo.png" width="64" height="64" /></a>
+			</div>
+			<div class="col-sm-9">
+				<h1 class="display-4">Exclusion list</h1>
+			</div>
+		</div>
+		<div class="container-fluid">
+			<div class="row" th:if="${exclusion}">
+				<div class="col-md-10 col-md-offset-1">
+					<table class="table table-striped">
+						<thead>
+							<tr>
+							<th class="col-md-1">
+								#
+							</th>
+							<th class="col-md-7">
+								Website			
+							</th>				
+							<th class="col-md-2">
+								Since
+							</th>
+							<th class="col-md-2">
+								Until
+							</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each = "h,iterStatus :${exclusion}">
+								<td th:utext="${iterStatus.count}+${pageNumber}*${size}"></td>
+								<td th:utext="${h.host}"></td>
+								<td th:if="${h.excludedSince}" th:utext="${#dates.format(h.excludedSince, 'yyyy-MM-dd')}"></td>
+								<td th:if="${h.excludedTill}" th:utext="${#dates.format(h.excludedTill, 'yyyy-MM-dd')}"></td>
+							</tr>
+						</tbody>
+					</table>
+					<div class="col-md-10 col-md-offset-1" th:if="${exclusion.size()}==0">
+						<h3 style="text-align:center;">No records found</h3>
+						<br></br>
+					</div>
+				</div>
+				<div class="col-md-12">
+					<p style="text-align:center;" th:text="'Cache expires at: ' + ${#dates.format(cachetime, 'yyyy-MM-dd hh:mm:ss')}">testing</p>
+					<hr></hr>
+				</div>
+				<div class="row">
+					<div class="col-sm-1 col-sm-offset-2 text-left">
+						<form role="form" class="form-inline" action="#" th:action="@{/exclusion}" method="GET" th:if="${pageNumber}!=0">
+						<button type="submit" class="btn btn-default" >
+							Prev
+						</button>
+						<input type="hidden" name="pageNumber" th:value="${pageNumber}-1" />
+						</form>
+					</div>
+					<div class="col-sm-6">
+						<h4 style="text-align:center;" th:text="'Total records: ' + ${total}"></h4>
+					</div>
+					<div class="col-sm-1 text-right">
+					<form role="form" class="form-inline" action="#" th:action="@{/exclusion}" method="GET" th:if="!${last}">
+					<button type="submit" class="btn btn-default pull-right" th:if="!${last}">
+						Next
+					</button>
+					<input type="hidden" name="pageNumber" th:value="${exclusion}+1" />
+					</form>
+					</div>					
+				</div>				
+			</div>
+		</div>
+	</body>
+</html>
+
+

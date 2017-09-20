@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <!-- Latest compiled and minified CSS -->
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.1.3/css/bootstrap-datetimepicker.min.css" />
+      <link rel="sytlesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" />
+      <!-- Latest compiled and minified JavaScript -->
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.1.3/js/bootstrap-datetimepicker.min.js"></script>
+   </head>
+   <body>
+      <div class="container-fluid page-header">
+         <div class="col-sm-1 col-sm-offset-1">
+            <a href="/"><img th:src="@{images/logo.png}" src="../static/images/logo.png" width="64" height="64" /></a>
+         </div>
+         <div class="col-sm-9">
+            <h1 class="display-4">Settings</h1>
+         </div>
+      </div>
+      <div class="container-fluid">
+         <div class="row">
+            <div class="col-md-5 col-md-offset-1">
+               <div class="row">
+                  <div class="col-xs-8">
+                     <h4>Exlcusion Setting</h4>
+                  </div>
+                  <div class="col-xs-4 text-right">
+                     <a href="/exclusion" class="btn btn-primary">
+                     Excluded sites
+                     </a>
+                  </div>
+               </div>
+               <hr>            
+               </hr>
+               <form role="form" action="#" th:action="@{/setexclusion}" method="post">
+                  <div class="form-group">
+                     <label for="exclusionurl">
+                     Exclusion URL
+                     </label>
+                     <input type="url" class="form-control" id="exclusionurl" name="exclusionurl" th:value="${exclusionurl}"/>
+                  </div>
+                  <div class="form-group">
+                     <label for="cacheTTL">
+                     Cache TTL (seconds)
+                     </label>
+                     <input type="number" class="form-control" id="cacheTTL" name="cacheTTL" th:value="${cachettl}"/>
+                  </div>
+                  <button type="submit" class="btn btn-default">
+                  Submit
+                  </button>
+               </form>
+            </div>
+            <div class="col-md-5">
+               <div class="row">
+                  <div class="col-xs-8">
+                     <h4>Import Setting</h4>
+                  </div>
+                  <div class="col-xs-4 text-right">
+                     <a href="/history" class="btn btn-primary">
+                     Import history
+                     </a>
+                  </div>
+               </div>
+               <hr>
+               </hr>					
+               <form role="form" action="#" th:action="@{/setwatch}" method="post">
+                  <div class="form-group">
+                     <label for="watchpath">
+                     Workfile monitor folder
+                     </label>
+                     <input type="text" class="form-control" id="watchpath" name="watchpath"  th:value="${watchpath}" />
+                  </div>
+                  <div class="form-group">
+                     <label for="donepath">
+                     Done folder (to store imported files) 
+                     </label>
+                     <input type="text" class="form-control" id="donepath" name="donepath"  th:value="${donepath} "/>
+                  </div>
+                  <button type="submit" class="btn btn-default">
+                  Submit
+                  </button>
+               </form>
+            </div>
+         </div>
+         <br></br>
+         <div class="row">
+        	<div class="col-md-10 col-md-offset-1" th:if="${message}">
+	            <div class="alert alert-success" th:text="${message}">Message</div>
+            </div>
+         </div>
+         <div class="row">
+			<div class="col-md-10 col-md-offset-1" th:if="${error}">
+	            <div class="alert alert-danger" th:text="${error}">Error</div>
+            </div>         
+         </div>
+      </div>
+   </body>
+</html>
