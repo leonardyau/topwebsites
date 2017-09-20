@@ -29,3 +29,4 @@ application settings.
 <li> More robust error handling of database exception (e.g. Possible to start up the application even database is down,
   failover handling of database)
 <li> Automated UI test
+<li> Use database to store the user credentials, separate different roles for users
