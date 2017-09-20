@@ -1,10 +1,10 @@
 package com.leonardyau.topwebsite.service;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -128,17 +128,41 @@ public class FileImportManager implements FileHandler {
 		int success = 0;
 		int total = 0;
 		log.info("Start processing {}", path);
-		long duration = System.currentTimeMillis();
-		FileLock lock = null;
-		RandomAccessFile csvfile = null;
+		long duration = 0;
+		File csvfile = path.toFile();
+		BufferedReader reader = null;
 		String line = null;
+		int count = 10;
+		// File path passed by file watcher may still be opened, try to wait a bit
+		// before reading it, otherwise may get exception
+		while (count > 0) {
+			if (!csvfile.exists()) {
+				log.warn("File {} does not exist anymore", path);
+				return;
+			} else if (!csvfile.canRead()) {
+				log.info("Cannot read file {}", path);
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+				}
+				count++;
+			} else {
+				try {
+					reader = new BufferedReader(new FileReader(csvfile));
+					duration = System.currentTimeMillis();
+					break;
+					// somehow still cannot open it, try wait
+				} catch (FileNotFoundException e) {
+					count++;
+				}
+			}
+		}
+		if (reader == null) {
+			log.warn("File {} cannot be read after waiting", path);
+		}
 		try {
-			// File path passed by file watcher may still be opened, try to gain lock
-			// before reading it, otherwise may get IOException
-			csvfile = new RandomAccessFile(new File(path.toString()), "rw");
-			FileChannel channel = csvfile.getChannel();
-			lock = channel.lock();
-			while ((line = csvfile.readLine()) != null) {
+
+			while ((line = reader.readLine()) != null) {
 				total++;
 				WebSiteAccess w = extractRecord(line);
 				if (w != null) {
@@ -147,18 +171,16 @@ public class FileImportManager implements FileHandler {
 				}
 			}
 		} catch (IOException e) {
-			log.error("Error in importing {} of file {}", line, path.toString());
+			log.error("Error in importing {} of file {}: {}", line, path.toString(), e.getMessage());
+			e.printStackTrace();
 		} finally {
 
 			try {
 				log.info("Done processing {}, {} lines read, {} records imported", path, total, success);
 				duration = System.currentTimeMillis() - duration;
 				history.save(new ImportHistory(new Date(), path.toString(), total, success, duration));
-				if (lock != null && lock.isValid())
-					lock.release();
-				if (csvfile != null)
-					csvfile.close();
-
+				if (reader != null)
+					reader.close();
 				moveFile(path);
 			} catch (IOException e) {
 				log.error("Error in finishing import {}", e.getMessage());

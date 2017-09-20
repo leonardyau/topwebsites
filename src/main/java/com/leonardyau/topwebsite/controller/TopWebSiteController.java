@@ -2,6 +2,7 @@ package com.leonardyau.topwebsite.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -22,7 +23,6 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.leonardyau.topwebsite.model.FilterSite;
 import com.leonardyau.topwebsite.model.ImportHistory;
@@ -108,6 +108,18 @@ public class TopWebSiteController {
 		return "settings";
 	}
 
+	boolean checkUrl(String url) {
+		try {
+			if (url == null || !ResourceUtils.isUrl(url) || !url.trim().toLowerCase().startsWith("http")) {
+				return false;
+			}
+			new URL(url).toURI();
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
+
 	/**
 	 * To update exclusion service parameters, clear the cache after successful
 	 * update
@@ -126,8 +138,7 @@ public class TopWebSiteController {
 		model.addAttribute("exclusionurl", exclusionurl);
 		if (cacheTTL < 0) {
 			model.addAttribute("error", "CacheTTL must be > 0");
-		} else if (exclusionurl == null || !ResourceUtils.isUrl(exclusionurl)
-				|| !exclusionurl.trim().toLowerCase().startsWith("http")) {
+		} else if (!checkUrl(exclusionurl)) {
 			model.addAttribute("error", exclusionurl + " is not a valid URL");
 		} else {
 			filtersitemanager.setFilterURL(exclusionurl.trim());

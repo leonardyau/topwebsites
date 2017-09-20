@@ -2,9 +2,7 @@ package com.leonardyau.topwebsite.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,6 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
@@ -89,5 +88,26 @@ public class FileImportManagerTest {
 			}
 		}
 	}
+	
+	@Test
+	public void testImportSameFile() throws IOException {
+
+		try {
+			Path tempdir = Files.createTempDirectory("tempdir");
+			tempdir.toFile().deleteOnExit();
+			
+			Path tmpfile = Paths.get(tempdir.toString(), "a.csv");
+			tmpfile.toFile().createNewFile();
+			fm.process(tmpfile);
+			tmpfile.toFile().createNewFile();
+			fm.process(tmpfile);
+			assertEquals(tempdir.toFile().listFiles().length, 0);
+			assertEquals(donedir.toFile().listFiles().length, 2);
+		} finally {
+			for (File f : donedir.toFile().listFiles()) {
+				f.delete();
+			}
+		}
+	}	
 
 }
