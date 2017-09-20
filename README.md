@@ -25,3 +25,7 @@ user id: "manulifedemo\manulifedemo" (both part) and password: manuLifedemo1
 Put your CSV file to be imported under D:\home\workfile or alternatively you can set up the import path under
 application settings.
 
+<h2>Potential Enhancement</h2>
+<li> More robust error handling of database exception (e.g. Possible to start up the application even database is down,
+  failover handling of database)
+<li> Automated UI test
